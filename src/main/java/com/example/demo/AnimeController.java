@@ -20,7 +20,17 @@ public class AnimeController {
 
 	@RequestMapping("/")
 	public String index() {
-		return "/index.html";
+		return "index";
+	}
+	
+	@RequestMapping("/Refine")
+	public String Refine() {
+		return "Refine";
+	}
+	
+	@RequestMapping("/AgeSerch")
+	public String AgeSerch() {
+		return "AgeSerch";
 	}
 
     /**
