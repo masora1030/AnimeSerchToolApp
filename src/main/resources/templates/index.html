@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>AnimeSerch APP</title>
+</head>
+<body>
+    <h2>Anime Serch App</h2>
+
+    <form method="get" action="#" class="search_container" style="position: absolute; right: 0px; top: 0px">
+	  	<input type="text" size="25" placeholder=" キーワード検索">
+	 	<input type="submit" value="Search">
+	</form>
+
+    <hr />
+
+    <h3>アニメタイトルで検索する</h3>
+    <form method="post" th:action="@{/titleserch}">
+        <p>アニメタイトル：<input type="text" name="animetitle" maxlength='31' placeholder='タイトルを入力してください' required /> ＊必須 <input type="submit" value="検索" /> </p>
+        <a th:href="@{/Refine}">絞り込み検索はこちらをクリック</a> <br>
+        <a th:href="@{/Age}">あなたの年代に合ったおすすめアニメはこちらをクリック</a>
+    </form>
+
+</body>
+</html>
