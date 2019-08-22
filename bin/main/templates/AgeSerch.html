@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>AnimeSerch APP</title>
+</head>
+<body>
+    <h2>Anime Serch App</h2>
+
+    <form method="get" th:action="@{/titleserch}" class="search_container" style="position: absolute; right: 0px; top: 0px">
+	  	<input type="text" size="25" placeholder=" アニメタイトル検索">
+	 	<input type="submit" value="検索">
+	</form>
+
+    <hr />
+
+    <h3>自分世代のアニメを検索する</h3>
+    <form method="get" th:action="@{/ageserch}">
+        <p>あなたの年齢　：
+						<select name="age" required>
+						<option value="">選択してください</option>
+						<option value="20歳未満">20歳未満</option>
+						<option value="20-29歳">20-29歳</option>
+						<option value="30-39歳">30-39歳</option>
+						<option value="40-49歳">40-49歳</option>
+						<option value="50-59歳">50-59歳</option>
+						<option value="60-69歳">60-69歳</option>
+						<option value="70-79歳">70-79歳</option>
+						<option value="80歳以上">80歳以上</option>
+						</select>
+						<strong>*必須</strong>
+        </p>
+        <input type="submit" value="検索" />
+    </form>
+
+</body>
+</html>

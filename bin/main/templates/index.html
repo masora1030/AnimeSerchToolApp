@@ -7,18 +7,18 @@
 <body>
     <h2>Anime Serch App</h2>
 
-    <form method="get" action="#" class="search_container" style="position: absolute; right: 0px; top: 0px">
-	  	<input type="text" size="25" placeholder=" キーワード検索">
-	 	<input type="submit" value="Search">
+    <form method="get" th:action="@{/titleserch}" class="search_container" style="position: absolute; right: 0px; top: 0px">
+	  	<input type="text" size="25" placeholder=" アニメタイトル検索">
+	 	<input type="submit" value="検索">
 	</form>
 
     <hr />
 
     <h3>アニメタイトルで検索する</h3>
-    <form method="post" th:action="@{/titleserch}">
+    <form method="get" th:action="@{/titleserch}">
         <p>アニメタイトル：<input type="text" name="animetitle" maxlength='31' placeholder='タイトルを入力してください' required /> ＊必須 <input type="submit" value="検索" /> </p>
-        <a th:href="@{/Refine}">絞り込み検索はこちらをクリック</a> <br>
-        <a th:href="@{/Age}">あなたの年代に合ったおすすめアニメはこちらをクリック</a>
+        <p> <a th:href="@{/Refine}">絞り込み検索はこちらをクリック</a> </p>
+        <p> <a th:href="@{/AgeSerch}">あなたの年代に合ったおすすめアニメはこちらをクリック</a> </p>
     </form>
 
 </body>
