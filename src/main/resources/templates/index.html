@@ -20,6 +20,30 @@
         <p> <a th:href="@{/Refine}">絞り込み検索はこちらをクリック</a> </p>
         <p> <a th:href="@{/AgeSerch}">あなた年代に合ったおすすめアニメはこちらをクリック</a> </p>
     </form>
+    
+    <h3>検索結果</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">タイトル</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映方法</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映開始年</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">原作</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">URL</font></th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr th:each="doc : ${result}">
+                <td th:text="${doc.get(&#34;animetitle&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;medium&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;startedyear&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;animeauthor&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;madburl&#34;)}"> </td>
+            </tr>
+        </tbody>
+    </table>
+    
 
 </body>
 </html>

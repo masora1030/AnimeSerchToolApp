@@ -17,6 +17,8 @@ public class AnimeServer {
 	String solrCoreName;
 
 	AnimeServer() {
+		solrHome = "http://localhost:8983/solr/";
+	    solrCoreName = "core_name/";
 		client = new HttpSolrClient.Builder("http://localhost:8983/solr/core_name").build();
     }
 
@@ -44,6 +46,18 @@ public class AnimeServer {
 
 	public QueryResponse query(SolrQuery solrQuery) {
         try {
+			return client.query(solrQuery);
+		} catch (SolrServerException | IOException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+			return null;
+		}
+    }
+	
+	public QueryResponse findAll() {
+		SolrQuery solrQuery = new SolrQuery("*:*");
+        try {
+        	solrQuery.setRows(100);
 			return client.query(solrQuery);
 		} catch (SolrServerException | IOException e) {
 			// TODO 自動生成された catch ブロック

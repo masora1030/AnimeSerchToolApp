@@ -4,8 +4,11 @@ import java.util.Optional;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +21,18 @@ import com.example.demo.AnimeServer;
 public class AnimeController {
 	AnimeServer client = new AnimeServer();
 
-	@RequestMapping("/")
-	public String index() {
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String index(Model model) {
+		// 検索結果の出力
+		SolrDocumentList result = client.findAll().getResults();
+		if (CollectionUtils.isEmpty(result)) {
+			model.addAttribute("emptyMessage", "検索結果はありません。");
+		    }
+		model.addAttribute("resultnum", result.getNumFound() + "件ヒットしました");
+		model.addAttribute("result", result);
+		for (SolrDocument doc : result) {
+			System.out.println(doc.get("id") + "," + doc.get("animetitle"));
+		}
 		return "index";
 	}
 	
