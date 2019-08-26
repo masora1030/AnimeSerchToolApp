@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+function showUrl(index){
+    var currentURL = location.href;
+    var url = "/vote";
+
+    var JSONdata = {
+    		    id: index,
+    	currentURL: currentURL      
+    };
+
+	$.ajax({
+	    type : 'POST',
+	    url : url,
+	    data : JSON.stringify(JSONdata),
+	    contentType: 'application/json',
+	    dataType : 'JSON'
+	});
+    alert("投票しました。");
+}
+</script>
+<title>AnimeSearch APP</title>
+</head>
+<body>
+    <h2>Anime Search App</h2>
+
+    <form method="get" th:action="@{/titlesearch}" style="position: absolute; right: 0px; top: 0px">
+	  	<input type="text" name="animetitle" maxlength='31' size="25" placeholder=" アニメタイトル検索">
+	 	<input type="submit" value="検索">
+	</form>
+	
+	<p> <a th:href="@{/}">ホームに戻る</a> </p>
+
+    <hr />
+
+    <h3>自分世代の人気アニメを検索する</h3>
+    <form method="get" th:action="@{/agesearch}">
+        <p>あなたの年齢　：
+						<select name="gen" required>
+						<option value="">選択してください</option>
+						<option value="2015">15歳未満</option>
+						<option value="2010">15-20歳</option>
+						<option value="2005">21-25歳</option>
+						<option value="2000">26-30歳</option>
+						<option value="1995">31-35歳</option>
+						<option value="1990">36-40歳</option>
+						<option value="1985">41-45歳</option>
+						<option value="1980">46-50歳</option>
+						<option value="1975">51-55歳</option>
+						<option value="1970">56-60歳</option>
+						<option value="1965">61-65歳</option>
+						<option value="1960">66-70歳</option>
+						<option value="1955">71-75歳</option>
+						<option value="1950">76-80歳</option>
+						<option value="1945">81-85歳</option>
+						<option value="1940">86-90歳</option>
+						<option value="1935">91-95歳</option>
+						<option value="1930">96-100歳</option>
+						<option value="1925">101-105歳</option>
+						<option value="1920">106-110歳</option>
+						<option value="1915">111歳以上</option>
+						</select>
+						<strong>*必須</strong>
+        </p>
+        <input type="submit" value="検索" />
+    </form>
+    
+    <h3>検索結果</h3>
+    <p th:text = "${generation}" > </p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">タイトル</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映方法</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映開始年</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">原作</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">サイト</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">投票</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">得票数</font></th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr th:each="doc : ${result}">
+                <td th:text="${doc.get(&#34;animetitle&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;medium&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;startedyear&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;animeauthor&#34;)}"> </td>
+                <td ><a th:if="${doc.get(&#34;officialurl&#34;) != null || doc.get(&#34;madburl&#34;) != null}" th:href="${doc.get(&#34;officialurl&#34;) == null} ? ${doc.get(&#34;madburl&#34;)} : ${doc.get(&#34;officialurl&#34;)}" th:target="_blank">リンクへ</a></td>
+                <td >
+                       <input type="hidden" id="currentURL" />
+                       <button type="button" th:attr="onclick='showUrl(&#34;' + ${doc.get(&#34;id&#34;)} + '&#34;);'">
+					   この作品に投票
+					   </button>
+                </td>
+                <td th:text="${doc.get(&#34;points&#34;)}"> </td>
+            </tr>
+        </tbody>
+    </table>
+    
+
+</body>
+</html>
