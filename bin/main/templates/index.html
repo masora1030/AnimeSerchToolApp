@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
 function showUrl(index){
     var currentURL = location.href;
@@ -12,15 +13,66 @@ function showUrl(index){
     		    id: index,
     	currentURL: currentURL      
     };
-
-	$.ajax({
-	    type : 'POST',
-	    url : url,
-	    data : JSON.stringify(JSONdata),
-	    contentType: 'application/json',
-	    dataType : 'JSON'
-	});
-    alert("投票しました。");
+    
+    swal("投票しますか？", {
+		  buttons: {
+		    cancel: "しません",
+		    vote: {
+		        text: "します",
+		        value: "vote",
+		      },
+		  },
+		})
+		.then((value) => {
+		  switch (value) {
+		 
+		    case "vote":
+		    	swal("本当にこの作品に愛を持って投票しますか？", {
+		  		  buttons: {
+		  		    cancel: "しません",
+		  		  	vote: {
+				        text: "します",
+				        value: "vote",
+				      },
+		  		  },
+		  		})
+		  		.then((value) => {
+		  		  switch (value) {
+		  		 
+		  		    case "vote":
+			  		    swal("投票しました！", "You voted successfully!" , "success")
+			  		    .then((value) => {
+			  		    	$.ajax({
+				  		  	    type : 'POST',
+				  		  	    url : url,
+				  		  	    data : JSON.stringify(JSONdata),
+				  		  	    contentType: 'application/json',
+				  		  	    dataType : 'JSON'
+				  		  	  });
+			  		    	//wait 
+			  		    	const d1 = new Date();
+			  		    	while (true) {
+			  		    	  const d2 = new Date();
+			  		    	  if (d2 - d1 > 1000) {
+			  		    	    break;
+			  		    	  }
+			  		    	}
+		  		        	location.reload();
+			  		    });
+		  		      break;
+		  		 
+		  		    default:
+		  		    　swal("キャンセルしました。", "", "error");
+		  		    　exit;
+		  		  }
+		  		});
+		      break;
+		 
+		    default:
+		      swal("キャンセルしました。", "", "error");
+		      exit;
+		  }
+		});
 }
 </script>
 <title>AnimeSearch APP</title>
