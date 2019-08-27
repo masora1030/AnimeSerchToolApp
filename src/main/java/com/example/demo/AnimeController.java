@@ -1,16 +1,15 @@
 package com.example.demo;
 
-import java.util.Optional;
 
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.AnimeServer;
 
@@ -18,27 +17,75 @@ import com.example.demo.AnimeServer;
 public class AnimeController {
 	AnimeServer client = new AnimeServer();
 
-	@RequestMapping("/")
-	public String index() {
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String index(Model model) {
+		// ランキングの出力
+		SolrDocumentList result = client.findAll().getResults();
+		if (CollectionUtils.isEmpty(result)) {
+			model.addAttribute("emptyMessage", "検索結果はありません。");
+		    }
+		model.addAttribute("resultnum", result.getNumFound() + "件ヒットしました");
+		model.addAttribute("result", result);
 		return "index";
 	}
 	
-	@RequestMapping("/Refine")
-	public String Refine() {
-		return "Refine";
+	@RequestMapping(value = "/Search", method = RequestMethod.GET)
+	public String Search(Model model, @RequestParam("animetitle") String animetitle, 
+									 @RequestParam("startedyear") String startedyear,
+									 @RequestParam("endedyear") String endedyear,
+									 @RequestParam("medium") String medium) {
+		// 検索結果の出力
+		SolrDocumentList result = client.SearchCategory(this.solrEscape(animetitle), startedyear, endedyear, medium).getResults();
+		if (CollectionUtils.isEmpty(result)) {
+			model.addAttribute("resultnum", "検索結果はありません。");
+	    } else {
+	    	model.addAttribute("resultnum", result.getNumFound() + "件ヒットしました。");
+	    }
+		model.addAttribute("result", result);
+		model.addAttribute("title", animetitle);
+		return "Search";
 	}
 	
-	@RequestMapping("/AgeSerch")
-	public String AgeSerch() {
-		return "AgeSerch";
+	@RequestMapping(value = "/titlesearch", method = RequestMethod.GET)
+	public String Search(Model model, @RequestParam("animetitle") String animetitle) {
+		// 検索結果の出力
+		SolrDocumentList result = client.SearchTitle(this.solrEscape(animetitle)).getResults();
+		if (CollectionUtils.isEmpty(result)) {
+			model.addAttribute("resultnum", "検索結果はありません。");
+	    } else {
+	    	model.addAttribute("resultnum", result.getNumFound() + "件ヒットしました。");
+	    }
+		model.addAttribute("result", result);
+		model.addAttribute("title", animetitle);
+		return "Search";
 	}
-
-    /**
-     * <p>[概 要] HTMLエスケープ処理</p>
-     * @param  str 文字列
-     * @return HTMLエスケープ後の文字列
-     */
-	public String htmlEscape(String str){
+	
+	@RequestMapping("/AgeSearch")
+	public String AgeSearch() {
+		return "AgeSearch";
+	}
+	
+	@RequestMapping(value = "/agesearch", method = RequestMethod.GET)
+	public String agesearch(Model model, @RequestParam("gen") String gen) {
+		SolrDocumentList result = client.SearchGen(gen).getResults();
+		if (CollectionUtils.isEmpty(result)) {
+			model.addAttribute("resultnum", "検索結果はありません。");
+	    } else {
+	    	model.addAttribute("resultnum", result.getNumFound() + "件ヒットしました。");
+	    }
+		model.addAttribute("result", result);
+		model.addAttribute("generation", gen + "年ごろに人気だったアニメはこちら");
+		return "AgeSearchResult";
+	}
+	
+	@RequestMapping(value = "/vote", method = RequestMethod.POST)
+	@ResponseBody
+    public String vote(@RequestBody Syain syain) {
+		client.vote(syain.getId());
+		return syain.getCurrentURL();
+    }
+	
+	public String solrEscape(String str){
 		StringBuffer result = new StringBuffer();
 		for(char c : str.toCharArray()) {
 			switch (c) {
@@ -48,11 +95,12 @@ public class AnimeController {
 			case '"' :
 			case '\'' :
 			case ' ' :
+				result.append('\\');
 				break;
 			default :
-				result.append(c);
 				break;
 			}
+			result.append(c);
 		}
 		return result.toString();
 	}

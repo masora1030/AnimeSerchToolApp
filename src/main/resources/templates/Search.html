@@ -2,21 +2,96 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8"/>
-<title>AnimeSerch APP</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+function showUrl(index){
+    var currentURL = location.href;
+    var url = "/vote";
+
+    var JSONdata = {
+    		    id: index,
+    	currentURL: currentURL      
+    };
+    
+    swal("投票しますか？", {
+		  buttons: {
+		    cancel: "しません",
+		    vote: {
+		        text: "します",
+		        value: "vote",
+		      },
+		  },
+		})
+		.then((value) => {
+		  switch (value) {
+		 
+		    case "vote":
+		    	swal("本当にこの作品に愛を持って投票しますか？", {
+		  		  buttons: {
+		  		    cancel: "しません",
+		  		  	vote: {
+				        text: "します",
+				        value: "vote",
+				      },
+		  		  },
+		  		})
+		  		.then((value) => {
+		  		  switch (value) {
+		  		 
+		  		    case "vote":
+			  		    swal("投票しました！", "You voted successfully!" , "success")
+			  		    .then((value) => {
+			  		    	$.ajax({
+				  		  	    type : 'POST',
+				  		  	    url : url,
+				  		  	    data : JSON.stringify(JSONdata),
+				  		  	    contentType: 'application/json',
+				  		  	    dataType : 'JSON'
+				  		  	  });
+			  		    	//wait 
+			  		    	const d1 = new Date();
+			  		    	while (true) {
+			  		    	  const d2 = new Date();
+			  		    	  if (d2 - d1 > 1000) {
+			  		    	    break;
+			  		    	  }
+			  		    	}
+		  		        	location.reload();
+			  		    });
+		  		      break;
+		  		 
+		  		    default:
+		  		    　swal("キャンセルしました。", "", "error");
+		  		    　exit;
+		  		  }
+		  		});
+		      break;
+		 
+		    default:
+		      swal("キャンセルしました。", "", "error");
+		      exit;
+		  }
+		});
+}
+</script>
+<title>AnimeSearch APP</title>
 </head>
 <body>
-    <h2>Anime Serch App</h2>
+    <h2>Anime Search App</h2>
 
-   <form method="get" th:action="@{/titleserch}" class="search_container" style="position: absolute; right: 0px; top: 0px">
-	  	<input type="text" size="25" placeholder=" アニメタイトル検索">
+    <form method="get" th:action="@{/titlesearch}" style="position: absolute; right: 0px; top: 0px">
+	  	<input type="text" name="animetitle" maxlength='31' size="25" placeholder=" アニメタイトル検索">
 	 	<input type="submit" value="検索">
 	</form>
+	
+	<p> <a th:href="@{/}">ホームに戻る</a> </p>
 
     <hr />
 
-    <h3>絞り込み検索     <strong>＊いずれかの項目必須</strong> </h3>
-    <form method="get" th:action="@{/multipleserch}">
-        <p>アニメタイトル：<input type="text" name="animetitle" maxlength='31' placeholder='タイトルを入力してください' required /> </p>
+    <h3>アニメを検索する</h3>
+    <form method="get" th:action="@{/Search}">
+        <p>アニメタイトル：<input type="text" name="animetitle" maxlength='31' th:placeholder="${title}" /> あいまいなものもヒットします。 </p>
         <p>放映年（西暦）：
 					　	<select name="startedyear">
 						<option value="">指定なし</option>
@@ -236,7 +311,42 @@
 						</select>
         </p>
         <input type="submit" value="検索" />
+        <p> <a th:href="@{/AgeSearch}">あなた年代に合ったおすすめアニメはこちらをクリック</a> </p>
     </form>
+    
+    <h3>検索結果</h3>
+    <p th:text = "${resultnum}" > </p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">タイトル</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映方法</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">放映開始年</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">原作</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">サイト</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">投票</font></th>
+                <th bgcolor="#FFFFFF"><font color="#EE0000">得票数</font></th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr th:each="doc : ${result}">
+                <td th:text="${doc.get(&#34;animetitle&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;medium&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;startedyear&#34;)}"> </td>
+                <td th:text="${doc.get(&#34;animeauthor&#34;)}"> </td>
+                <td ><a th:if="${doc.get(&#34;officialurl&#34;) != null || doc.get(&#34;madburl&#34;) != null}" th:href="${doc.get(&#34;officialurl&#34;) == null} ? ${doc.get(&#34;madburl&#34;)} : ${doc.get(&#34;officialurl&#34;)}" th:target="_blank">リンクへ</a></td>
+                <td >
+                       <input type="hidden" id="currentURL" />
+                       <button type="button" th:attr="onclick='showUrl(&#34;' + ${doc.get(&#34;id&#34;)} + '&#34;);'">
+					   この作品に投票
+					   </button>
+                </td>
+                <td th:text="${doc.get(&#34;points&#34;)}"> </td>
+            </tr>
+        </tbody>
+    </table>
+    
 
 </body>
 </html>
